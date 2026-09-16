@@ -90,3 +90,39 @@ if __name__ == "__main__":
     mini, maxi = min_max_taux(donnees)
     print(f"Taux minimum : {mini[1]} (le {mini[0]})")
     print(f"Taux maximum : {maxi[1]} (le {maxi[0]})")
+
+
+
+Partie A.2 — Utiliser une fonction d'une bibliothèque
+
+from statistics import mean
+from a1_fonctions import lire_taux, moyenne_taux  # on réutilise le travail de A.1
+
+def moyenne_avec_statistics(couples):
+    """
+    Calcule la moyenne des taux à l'aide de la fonction mean() du module statistics.
+
+    Paramètre :
+        couples (list[tuple[str, float]]) : liste de couples (date, taux).
+
+    Retour :
+        float : la moyenne des taux calculée par statistics.mean.
+    """
+    valeurs = [taux for _date, taux in couples]
+    return mean(valeurs)
+
+
+if __name__ == "__main__":
+    donnees = lire_taux("taux_EUR_USD.csv")
+
+    moy_maison = moyenne_taux(donnees)
+    moy_statistics = moyenne_avec_statistics(donnees)
+
+    print(f"Moyenne (fonction maison, A.1)   : {moy_maison:.6f}")
+    print(f"Moyenne (statistics.mean, A.2)   : {moy_statistics:.6f}")
+    print(f"Écart entre les deux méthodes    : {abs(moy_maison - moy_statistics):.2e}")
+
+    if abs(moy_maison - moy_statistics) < 1e-9:
+        print("\n=> Les deux méthodes donnent le même résultat (aux erreurs d'arrondi flottant près).")
+    else:
+        print("\n=> Attention, un écart significatif existe entre les deux méthodes !")
