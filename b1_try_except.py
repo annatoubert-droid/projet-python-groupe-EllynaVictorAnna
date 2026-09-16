@@ -1,10 +1,5 @@
-# -*- coding: utf-8 -*-
 """
 Partie B.1 - try/except
-Reprise de l'appel a l'API Frankfurter de la seance 1, entoure d'un
-try/except pour gerer les erreurs reseau : pas de connexion, code HTTP
-d'erreur (comme le 403 rencontre), reponse illisible.
-Devise du groupe : THB (baht thailandais)
 """
 
 import json
@@ -12,7 +7,6 @@ import os
 import urllib.error
 import urllib.request
 
-# --- Parametres -------------------------------------------------------------
 
 BASE = "EUR"
 DEVISE = "THB"
