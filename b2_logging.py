@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
+
 """
 Partie B.2 - logging
-Reprend B.1 (l'appel API protege par try/except) et remplace les print()
-de suivi par du logging : fichier de log, niveaux info / warning / error.
-Devise du groupe : THB (baht thailandais)
 """
 
 import json
