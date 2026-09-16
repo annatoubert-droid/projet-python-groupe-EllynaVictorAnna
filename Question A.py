@@ -1,10 +1,7 @@
-"""
+
 Partie A.1 — Écrire vos premières fonctions
-Lecture du CSV des taux, calcul de la moyenne (fonction maison) et du min/max.
-"""
 
 import csv
-
 
 def lire_taux(chemin_csv):
     """
