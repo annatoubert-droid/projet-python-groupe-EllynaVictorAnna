@@ -1,0 +1,418 @@
+================================================================
+ RÉVISIONS PYTHON - QUESTIONS / RÉPONSES
+================================================================
+
+PARTIE A - BASES DU LANGAGE
+================================================================
+
+A1. C'est quoi une compréhension de liste ? Avantage par rapport à une boucle for ?
+----------------------------------------------------------------
+Une compréhension de liste est une syntaxe compacte pour construire une
+liste à partir d'une autre séquence, en une seule ligne.
+
+    # Boucle for classique
+    carres = []
+    for x in range(5):
+        carres.append(x ** 2)
+
+    # Compréhension de liste
+    carres = [x ** 2 for x in range(5)]      # [0, 1, 4, 9, 16]
+
+Avec une condition :
+
+    pairs = [x for x in range(10) if x % 2 == 0]   # [0, 2, 4, 6, 8]
+
+Avantages :
+  - Plus courte et plus lisible (tant qu'elle reste simple)
+  - Généralement un peu plus rapide (optimisée en interne)
+  - Exprime directement l'intention : "construire une liste à partir de..."
+
+Limite : si la logique devient complexe (conditions imbriquées, plusieurs
+étapes), une boucle for classique reste plus claire.
+Existe aussi pour les dictionnaires {k: v for ...} et les ensembles
+{x for ...}.
+
+
+A2. À quoi servent enumerate et zip ?
+----------------------------------------------------------------
+enumerate : donne l'indice ET la valeur pendant le parcours.
+
+    fruits = ["pomme", "banane", "cerise"]
+    for i, fruit in enumerate(fruits):
+        print(i, fruit)          # 0 pomme / 1 banane / 2 cerise
+
+    for i, fruit in enumerate(fruits, start=1):   # commencer à 1
+        ...
+
+Évite le peu élégant "for i in range(len(fruits))".
+
+zip : parcourt plusieurs séquences en parallèle.
+
+    noms = ["Alice", "Bob", "Chloé"]
+    ages = [25, 30, 22]
+    for nom, age in zip(noms, ages):
+        print(nom, age)
+
+zip s'arrête à la plus courte des séquences.
+Utile aussi pour créer un dictionnaire : dict(zip(noms, ages)).
+
+
+A3. Trier une liste selon un critère (sorted avec key)
+----------------------------------------------------------------
+sorted() renvoie une NOUVELLE liste triée (l'originale n'est pas modifiée).
+Le paramètre key est une fonction appliquée à chaque élément ; son résultat
+sert de critère de tri.
+
+    mots = ["banane", "kiwi", "pomme", "fraise"]
+    sorted(mots)                 # ordre alphabétique
+    sorted(mots, key=len)        # par longueur
+    sorted(mots, reverse=True)   # ordre inverse
+
+    personnes = [("Alice", 25), ("Bob", 30), ("Chloé", 22)]
+    sorted(personnes, key=lambda p: p[1])    # tri par âge
+
+Note : liste.sort() fait la même chose mais modifie la liste EN PLACE
+et renvoie None.
+
+
+A4. C'est quoi une f-string ? Afficher un nombre à deux décimales
+----------------------------------------------------------------
+Une f-string est une chaîne préfixée par f, dans laquelle on insère des
+variables ou expressions entre accolades {}.
+
+    nom = "Alice"
+    age = 25
+    print(f"{nom} a {age} ans")            # Alice a 25 ans
+    print(f"Dans 5 ans : {age + 5} ans")   # expressions possibles
+
+Deux décimales : format :.2f
+
+    prix = 3.14159
+    print(f"{prix:.2f}")        # 3.14
+    print(f"{2:.2f}")           # 2.00
+    print(f"{1234.5:,.2f}")     # 1,234.50 (séparateur de milliers)
+    print(f"{0.256:.1%}")       # 25.6%   (pourcentage)
+
+".2f" = "2 chiffres après la virgule, en notation flottante".
+
+
+A5. C'est quoi une fonction lambda ?
+----------------------------------------------------------------
+Une lambda est une petite fonction anonyme, écrite sur une ligne, limitée à
+UNE SEULE expression (dont le résultat est renvoyé automatiquement).
+
+    def double(x):              # fonction classique
+        return x * 2
+
+    double = lambda x: x * 2    # équivalent en lambda
+
+Syntaxe : lambda arguments: expression
+
+Usage typique : passer une fonction rapide en argument (sorted, map, filter).
+
+    list(map(lambda x: x * 2, [1, 2, 3]))        # [2, 4, 6]
+    list(filter(lambda x: x > 2, [1, 2, 3, 4]))  # [3, 4]
+
+Si la fonction est complexe ou réutilisée, préférer un def avec un nom.
+
+
+================================================================
+PARTIE B - PROGRAMMATION ORIENTÉE OBJET
+================================================================
+
+B1. C'est quoi une classe ? Un objet ? Une instance ? À quoi sert self ?
+----------------------------------------------------------------
+Classe : le plan / modèle qui décrit ce qu'un type d'objet possède
+(attributs = données) et sait faire (méthodes = fonctions).
+
+Objet / instance : une réalisation concrète créée à partir de la classe.
+"Objet" et "instance" sont quasi synonymes : on dit "cet objet est une
+instance de la classe Chien".
+
+    class Chien:
+        def __init__(self, nom):
+            self.nom = nom
+
+        def aboyer(self):
+            return f"{self.nom} dit : Wouf !"
+
+    rex = Chien("Rex")        # rex est une instance de Chien
+    medor = Chien("Médor")    # une autre instance, indépendante
+    rex.aboyer()              # "Rex dit : Wouf !"
+
+self : référence à l'instance courante, c'est-à-dire l'objet sur lequel la
+méthode est appelée. C'est toujours le premier paramètre d'une méthode
+d'instance. Quand on écrit rex.aboyer(), Python le transforme en
+Chien.aboyer(rex) : self vaut donc rex. Grâce à self, chaque objet accède à
+SES propres données (self.nom).
+(self est une convention, pas un mot-clé, mais on l'utilise toujours.)
+
+
+B2. À quoi sert __init__ ?
+----------------------------------------------------------------
+__init__ est le constructeur (initialiseur) : méthode appelée
+automatiquement à la création d'une instance. Elle sert à initialiser les
+attributs de l'objet.
+
+    class Compte:
+        def __init__(self, titulaire, solde=0):
+            self.titulaire = titulaire
+            self.solde = solde
+
+    c = Compte("Alice", 100)    # __init__ est appelée ici automatiquement
+
+Elle ne renvoie rien (pas de return). Elle garantit que chaque objet
+démarre dans un état valide.
+
+
+B3. Attribut de classe vs attribut d'instance
+----------------------------------------------------------------
+Attribut d'instance : propre à chaque objet, défini dans __init__ via self.
+Chaque instance a sa propre valeur.
+
+Attribut de classe : défini directement dans le corps de la classe,
+PARTAGÉ par toutes les instances.
+
+    class Chien:
+        espece = "Canis lupus familiaris"   # attribut de classe (partagé)
+
+        def __init__(self, nom):
+            self.nom = nom                  # attribut d'instance
+
+    a = Chien("Rex")
+    b = Chien("Médor")
+    a.nom, b.nom          # "Rex", "Médor" (différents)
+    a.espece, b.espece    # identique pour tous
+    Chien.espece          # accessible aussi via la classe
+
+Piège classique : un attribut de classe MUTABLE (liste, dict) est partagé
+entre toutes les instances -> modifications visibles partout. Pour une
+liste propre à chaque objet, la créer dans __init__ (self.items = []).
+
+
+B4. Ce qu'apporte une dataclass par rapport à une classe écrite à la main
+----------------------------------------------------------------
+Le décorateur @dataclass génère automatiquement le code répétitif :
+__init__, __repr__, __eq__ (et plus, selon les options).
+
+    # À la main
+    class Point:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+        def __repr__(self):
+            return f"Point(x={self.x}, y={self.y})"
+        def __eq__(self, other):
+            return self.x == other.x and self.y == other.y
+
+    # Avec dataclass
+    from dataclasses import dataclass
+
+    @dataclass
+    class Point:
+        x: float
+        y: float
+
+Apports :
+  - Beaucoup moins de code (moins d'erreurs, plus lisible)
+  - Affichage lisible automatique : Point(x=1, y=2)
+  - Comparaison par valeur automatique (==)
+  - Valeurs par défaut simples, field(default_factory=list) pour les listes
+  - Options : frozen=True (immuable), order=True (comparaisons <, >),
+    ce qui permet aussi d'utiliser l'objet comme clé de dict (frozen)
+Idéale pour les classes qui servent surtout à stocker des données.
+
+
+================================================================
+PARTIE C - MATPLOTLIB
+================================================================
+
+C5. Différence entre figure et axes ? Pourquoi fig, ax = plt.subplots() ?
+----------------------------------------------------------------
+Figure (fig) : le conteneur global, la "feuille" ou fenêtre entière.
+Elle gère la taille, la résolution, la sauvegarde.
+
+Axes (ax) : une zone de tracé DANS la figure, avec ses axes x/y, son
+titre, sa légende, ses courbes. Une figure peut contenir plusieurs axes
+(sous-graphiques).
+
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.plot([1, 2, 3], [2, 4, 1], label="série")
+    ax.set_title("Mon graphique")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.legend()
+
+Pourquoi préférer l'approche objet (fig, ax) à plt.plot(...) direct :
+  - Contrôle explicite : on sait exactement sur quel graphique on agit
+  - Indispensable dès qu'il y a plusieurs sous-graphiques :
+        fig, axes = plt.subplots(1, 2)
+  - Pas d'état global implicite ("le graphique courant") qui provoque des
+    bugs quand on en manipule plusieurs
+  - Code plus propre, réutilisable dans des fonctions (passer ax en
+    paramètre)
+  - C'est l'approche recommandée par la documentation matplotlib
+
+
+C6. Quel type de graphique pour quel type de donnée ?
+----------------------------------------------------------------
+  Série temporelle (évolution dans le temps)
+      -> courbe (ax.plot), éventuellement avec marqueurs.
+      Date en abscisse, valeur en ordonnée.
+
+  Distribution (répartition d'une variable numérique)
+      -> histogramme (ax.hist) ; boîte à moustaches (ax.boxplot) pour
+      médiane/quartiles/valeurs aberrantes ; violin plot ; densité.
+
+  Comparaison entre catégories
+      -> diagramme en barres (ax.bar / ax.barh).
+      Barres horizontales si les noms de catégories sont longs.
+      Éviter le camembert dès qu'il y a plus de 3-4 parts.
+
+  Relation entre deux variables numériques
+      -> nuage de points (ax.scatter) ; corrélation visible.
+
+  Parts d'un tout
+      -> barres empilées, ou camembert (si très peu de catégories).
+
+  Bonnes pratiques : titre, étiquettes d'axes avec unités, légende si
+  plusieurs séries, ne pas tronquer l'axe y des barres (commencer à 0).
+
+
+C7. Sauvegarder une figure en PNG
+----------------------------------------------------------------
+    fig.savefig("graphique.png", dpi=300, bbox_inches="tight")
+
+  - dpi : résolution (300 = qualité impression)
+  - bbox_inches="tight" : supprime les marges blanches inutiles
+  - Le format se déduit de l'extension (.png, .pdf, .svg, .jpg)
+  - Appeler savefig AVANT plt.show() (sinon la figure peut être vide)
+  - plt.close(fig) ensuite pour libérer la mémoire (utile dans une boucle)
+
+
+================================================================
+PARTIE D - STRUCTURE D'UN PROJET / SCRIPT
+================================================================
+
+D1. À quoi sert argparse ? Pourquoi une ligne de commande plutôt que input() ?
+----------------------------------------------------------------
+argparse est le module standard pour lire et valider les arguments passés
+au script en ligne de commande.
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Trace un graphique")
+    parser.add_argument("fichier", help="fichier CSV d'entrée")
+    parser.add_argument("--sortie", default="out.png", help="image de sortie")
+    parser.add_argument("--dpi", type=int, default=150)
+    args = parser.parse_args()
+
+    # Utilisation :  python script.py donnees.csv --sortie graph.png --dpi 300
+
+Avantages par rapport à input() :
+  - Automatisable : le script tourne sans intervention humaine (scripts
+    shell, cron, pipelines, tests)
+  - Reproductible : la commande complète documente exactement ce qui a
+    été lancé
+  - Validation automatique des types, valeurs par défaut, arguments
+    obligatoires/optionnels
+  - Aide générée automatiquement avec  python script.py --help
+  - Messages d'erreur clairs si les arguments sont incorrects
+  - Plus rapide pour l'utilisateur (pas de questions à répéter)
+
+
+D2. Que fait exactement if __name__ == "__main__" ?
+----------------------------------------------------------------
+Chaque fichier Python possède une variable spéciale __name__ :
+  - si le fichier est EXÉCUTÉ directement (python monfichier.py),
+    __name__ vaut "__main__"
+  - si le fichier est IMPORTÉ depuis un autre (import monfichier),
+    __name__ vaut "monfichier"
+
+Le test permet donc d'exécuter du code seulement lorsque le fichier est
+lancé directement, et pas lors d'un import.
+
+    def calcul(x):
+        return x * 2
+
+    if __name__ == "__main__":
+        print(calcul(21))     # exécuté seulement en lançant le fichier
+
+Intérêt : le même fichier sert à la fois de script et de module importable,
+sans déclencher d'exécution indésirable à l'import. Convention : mettre le
+point d'entrée dans une fonction main() appelée ici.
+
+
+D3. C'est quoi un module ? Un package ?
+----------------------------------------------------------------
+Module : un simple fichier .py contenant du code (fonctions, classes,
+variables) que l'on peut importer.
+
+    # outils.py
+    def carre(x): return x * x
+
+    # autre fichier
+    import outils
+    outils.carre(3)
+    from outils import carre
+
+Package : un dossier regroupant plusieurs modules (et sous-packages),
+généralement avec un fichier __init__.py (optionnel depuis Python 3.3,
+mais recommandé).
+
+    monprojet/
+    +-- __init__.py
+    +-- donnees.py
+    +-- graphiques.py
+    +-- utils/
+        +-- __init__.py
+        +-- maths.py
+
+    from monprojet.graphiques import tracer
+    from monprojet.utils import maths
+
+En résumé : module = un fichier ; package = un dossier de modules.
+Ils servent à organiser le code, éviter les fichiers géants et faciliter
+la réutilisation.
+
+
+D4. README, requirements.txt et .gitignore
+----------------------------------------------------------------
+Un bon README (README.md) doit contenir :
+  - Le titre et une description courte : à quoi sert le projet
+  - Les prérequis (version de Python, dépendances)
+  - L'installation, étape par étape
+        python -m venv .venv
+        pip install -r requirements.txt
+  - L'utilisation, avec des exemples de commandes concrets
+        python main.py donnees.csv --sortie graph.png
+  - La structure du projet (dossiers/fichiers importants)
+  - Des exemples de résultats (captures, images) si pertinent
+  - Éventuellement : tests, licence, auteur / contact
+
+requirements.txt : liste des dépendances (bibliothèques) du projet, avec
+leurs versions, pour que n'importe qui puisse recréer le même
+environnement.
+    matplotlib==3.9.0
+    pandas>=2.0
+  Installation : pip install -r requirements.txt
+  Génération   : pip freeze > requirements.txt
+  (ou écrire à la main uniquement les dépendances directes)
+
+.gitignore : liste des fichiers/dossiers que Git doit IGNORER (ne pas
+versionner) :
+    .venv/            # environnement virtuel
+    __pycache__/      # fichiers compilés Python
+    *.pyc
+    .env              # secrets, clés d'API
+    .idea/  .vscode/  # configs d'éditeur
+    *.png             # sorties générées (selon le cas)
+    data/raw/         # gros fichiers de données
+  But : garder le dépôt propre, léger, et ne jamais publier de
+  secrets ou de fichiers générés.
+
+================================================================
+FIN
+================================================================
